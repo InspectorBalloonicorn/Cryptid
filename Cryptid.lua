@@ -18,6 +18,11 @@
 -- Enables debug features (I think this is currently useless.)
 --Cryptid.debug = true
 
+-- Initialize some important variables (taken from refactor)
+if not Cryptid then
+	Cryptid = {}
+end
+
 -- Save the mod path permanently.
 local mod_path = "" .. SMODS.current_mod.path
 -- Load Options
@@ -30,7 +35,7 @@ cry_enable_epics = Cryptid.enabled["Epic Jokers"]
 cry_enable_exotics = Cryptid.enabled["Exotic Jokers"]
 cry_minvasion = Cryptid.enabled["M Jokers"]
 
--- Gradient isn't included since other logic seems to also handle it
+-- Gradient isn't included since other logic seems to also handle 
 SMODS.Rarity{
     key = "exotic",
     loc_txt = {},
