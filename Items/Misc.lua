@@ -1011,23 +1011,19 @@ local abstracted = {
 	loc_vars = function(self, info_queue, center)
 		--return emult_value, emult_mod_value, numeratorProb1, denominator1, numeratorProb2, denominator2
 		return { vars = {
-		center.ability.extra.Emult,
-		center.ability.extra.Emult_mod,
+		center and center.ability.extra.Emult,
+		center and center.ability.extra.Emult_mod,
 		center and cry_prob(center.ability.cry_prob or 1, center.ability.extra.play_destroy, center.ability.cry_rigged),
-		center.ability.extra.play_destroy,
+		center and center.ability.extra.play_destroy,
 		center and cry_prob(center.ability.cry_prob or 1, center.ability.extra.round_destroy, center.ability.cry_rigged),
-		center.ability.extra.round_destroy
+		center and center.ability.extra.round_destroy
 		}}
 	end,
 	calculate =
 	function(self,card,context)
-		print ("Calculate Hit!")
 		if context.scoring_hand and context.cardarea == G.play and not context.repetition
 		then
 			card.ability.extra.Emult = card.ability.extra.Emult + card.ability.extra.Emult_mod
-			print (card.ability.extra.Emult)
-			local message = localize{type='variable',key='a_powmult',vars={number_format(card.ability.extra.Emult)}}
-			print (message)
 			return {
 				message = localize{type='variable',key='a_powmult',vars={number_format(card.ability.extra.Emult)}},
 				Emult_mod = card.ability.extra.Emult,
