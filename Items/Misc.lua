@@ -33,8 +33,8 @@ local meme1 = {
 	cost = 14,
 	weight = 0.18 / 3, --0.18 base ÷ 3 since there are 3 identical packs
 	create_card = function(self, card)
-                if Cryptid.enabled["Misc. Jokers"] and not (G.GAME.used_jokers['j_cry_waluigi'] and not next(find_joker("Showman"))) then 
-            		if pseudorandom('meme1_'..G.GAME.round_resets.ante) > 0.997 then 
+                if Cryptid.enabled["Misc. Jokers"] and not (G.GAME.used_jokers['j_cry_waluigi'] and not next(find_joker("Showman"))) then
+            		if pseudorandom('meme1_'..G.GAME.round_resets.ante) > 0.997 then
 				return create_card(nil, G.pack_cards, nil, nil, true, true, "j_cry_waluigi", nil)
 			end
 		end
@@ -72,8 +72,8 @@ local meme2 = {
 	cost = 14,
 	weight = 0.18 / 3, --0.18 base ÷ 3 since there are 3 identical packs
 	create_card = function(self, card)
-		if Cryptid.enabled["Misc. Jokers"] and not (G.GAME.used_jokers['j_cry_waluigi'] and not next(find_joker("Showman"))) then 
-            		if pseudorandom('memetwo_'..G.GAME.round_resets.ante) > 0.997 then 
+		if Cryptid.enabled["Misc. Jokers"] and not (G.GAME.used_jokers['j_cry_waluigi'] and not next(find_joker("Showman"))) then
+            		if pseudorandom('memetwo_'..G.GAME.round_resets.ante) > 0.997 then
 				return create_card(nil, G.pack_cards, nil, nil, true, true, "j_cry_waluigi", nil)
 			end
 		end
@@ -111,8 +111,8 @@ local meme3 = {
 	cost = 14,
 	weight = 0.18 / 3, --0.18 base ÷ 3 since there are 3 identical packs
 	create_card = function(self, card)
-		if Cryptid.enabled["Misc. Jokers"] and not (G.GAME.used_jokers['j_cry_waluigi'] and not next(find_joker("Showman"))) then 
-            		if pseudorandom('memethree_'..G.GAME.round_resets.ante) > 0.997 then 
+		if Cryptid.enabled["Misc. Jokers"] and not (G.GAME.used_jokers['j_cry_waluigi'] and not next(find_joker("Showman"))) then
+            		if pseudorandom('memethree_'..G.GAME.round_resets.ante) > 0.997 then
 				return create_card(nil, G.pack_cards, nil, nil, true, true, "j_cry_waluigi", nil)
 			end
 		end
@@ -212,7 +212,7 @@ local oversat = {
 	end,
 	on_remove = function(card)
 		cry_with_deck_effects(card, function(card)
-			cry_misprintize(card, {min = 1, max = 1}, true) -- 
+			cry_misprintize(card, {min = 1, max = 1}, true) --
 			cry_misprintize(card)
 		end)
 	end,
@@ -1000,7 +1000,63 @@ local light = {
 		end
 	end,
 }
-local seraph = { 
+
+local abstracted = {
+	object_type = "Enhancement",
+	key = "cry_abstract",
+	atlas = "cry_misc",
+	pos = { x = 3, y = 0},
+	shader = false,
+	config = {extra = {  Emult = 1, Emult_mod = 0.15, play_destroy = 2, round_destroy = 4}},
+	loc_vars = function(self, info_queue, center)
+		--return emult_value, emult_mod_value, numeratorProb1, denominator1, numeratorProb2, denominator2
+		return { vars = {
+		center.ability.extra.Emult,
+		center.ability.extra.Emult_mod,
+		center and cry_prob(center.ability.cry_prob or 1, center.ability.extra.play_destroy, center.ability.cry_rigged),
+		center.ability.extra.play_destroy,
+		center and cry_prob(center.ability.cry_prob or 1, center.ability.extra.round_destroy, center.ability.cry_rigged),
+		center.ability.extra.round_destroy
+		}}
+	end,
+	calculate =
+	function(self,card,context)
+		print ("Calculate Hit!")
+		if context.scoring_hand and context.cardarea == G.play and not context.repetition
+		then
+			card.ability.extra.Emult = card.ability.extra.Emult + card.ability.extra.Emult_mod
+			print (card.ability.extra.Emult)
+			local message = localize{type='variable',key='a_powmult',vars={number_format(card.ability.extra.Emult)}}
+			print (message)
+			return {
+				message = localize{type='variable',key='a_powmult',vars={number_format(card.ability.extra.Emult)}},
+				Emult_mod = card.ability.extra.Emult,
+				colour = G.C.DARK_EDITION,
+			}
+		end 
+	end
+}
+
+local abstractor = {
+	object_type = "Consumable",
+	set = "Tarot",
+	name = "cry-Abstractor",
+	key = "abstractor",
+	order = 3,
+	pos = { x = 1, y = 2 },
+	config = { mod_conv = "m_cry_abstract", max_highlighted = 1 },
+	atlas = "placeholders",
+	can_use = function(self, card)
+		return #G.consumeables.cards < G.consumeables.config.card_limit or card.area == G.consumeables
+	end,
+	loc_vars = function(self, info_queue)
+		info_queue[#info_queue + 1] = G.P_CENTERS.m_cry_abstract
+
+		return { vars = { self.config.max_highlighted } }
+	end,
+
+}
+local seraph = {
 	object_type = "Consumable",
 	set = "Tarot",
 	name = "cry-Seraph",
@@ -1160,16 +1216,16 @@ local meld = {
 	atlas = "atlasnotjokers",
 	can_use = function(self, card)
 		if #G.jokers.highlighted + #G.hand.highlighted - (G.hand.highlighted[1] and G.hand.highlighted[1] == self and 1 or 0) == 1 then
-			if 
-				#G.jokers.highlighted == 1 and 
+			if
+				#G.jokers.highlighted == 1 and
 				(
-					Card.no(G.jokers.highlighted[1], "dbl") 
+					Card.no(G.jokers.highlighted[1], "dbl")
 					or G.jokers.highlighted[1].edition
-				) 
+				)
 			then return false end
-			if 
-				#G.hand.highlighted == 1 
-				and G.hand.highlighted[1].edition 
+			if
+				#G.hand.highlighted == 1
+				and G.hand.highlighted[1].edition
 			then return false end
 			return true
 		end
@@ -1589,6 +1645,8 @@ local miscitems = {
 	absolute,
 	light,
 	seraph,
+	abstracted,
+	abstractor
 }
 if Cryptid.enabled["M Jokers"] then
 	miscitems[#miscitems + 1] = jollyeditionshader
@@ -1911,8 +1969,8 @@ return {
 			if next(find_joker("cry-Flip Side")) and self.dbl_side then
 				active_side = self.dbl_side
 			end
-			if not init_dbl_side then 
-				active_side:remove_from_deck(true) 
+			if not init_dbl_side then
+				active_side:remove_from_deck(true)
 			end
 			copy_dbl_card(self, self.dbl_side, false)
 			copy_dbl_card(tmp_side, self, false)

@@ -614,6 +614,16 @@ return {
                     "{C:inactive}(Currently {X:mult,C:white}X#2#{C:inactive} Mult)"
                 },
             },
+            m_cry_abstract = {
+                
+                name = "Abstract Card",
+                text = {
+                    "{X:dark_edition,C:white}^1.15{} Mult\n",
+                    "Counts as its own rank and suit\n",
+                    "{C:green}#3# in #4#{} chance to destroy this card when played\n",
+                    "{C:green}#5# in #6#{} chance to destroy this card at end of round\n"
+                },
+            },
         },
         Joker = {
             j_cry_adroit = {
